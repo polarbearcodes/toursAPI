@@ -44,6 +44,17 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     data: updatedUser,
   });
 });
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  // 1) create error if user posts password data
+  //2) update user document};
+  await User.findByIdAndUpdate(req.user.id, {
+    active: false,
+  });
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+});
 exports.getUser = (req, res) => {
   res.status(500).json({
     status: 'error',

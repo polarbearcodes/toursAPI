@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
+// const User = require('./userModel');
 const tourSchema = mongoose.Schema(
   {
     name: {
@@ -69,6 +70,28 @@ const tourSchema = mongoose.Schema(
     createdAt: { type: Date, default: Date.now(), select: false },
     startDates: [Date],
     secretTour: { type: Boolean, default: false },
+    startLocation: {
+      // GeoJSON
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      //using square brackets will create brand new documents inside parent document
+      {
+        type: { type: String, default: 'Point', enum: ['Point'] },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: [{ type: mongoose.Schema.ObjectId, ref: 'User' }], //using ref refeerences the user model
   },
   {
     toJSON: { virtuals: true },
@@ -87,12 +110,27 @@ tourSchema.virtual('durationWeeks').get(function () {
 //   next();
 // });
 
+//IMPLEMENT EMBEDDING DATA, might not be the best approach as user can update, and whenever update must go through every tour document to update
+// tourSchema.pre('save', async function (next) {
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
 //QUERY MIDDLEWARE
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
   this.start = Date.now();
   next();
 });
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    //'this' always points to the current query
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
+  next();
+});
+
 tourSchema.post(/^find/, function (docs, next) {
   console.log(`Query took ${Date.now() - this.start} milliseconds!`);
   next();

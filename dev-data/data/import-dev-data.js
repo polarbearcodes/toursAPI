@@ -12,9 +12,7 @@ const DB = process.env.DATABASE.replace(
 );
 mongoose.connect(DB).then((con) => {});
 //READ JSON FILE
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8')
-);
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
 const importData = async () => {
   try {
     await Tour.create(tours);
@@ -30,6 +28,8 @@ const importData = async () => {
 const deleteData = async () => {
   try {
     await Tour.deleteMany();
+    console.log('Data successfully deleted!');
+
     process.exit();
   } catch (err) {
     console.log(err);

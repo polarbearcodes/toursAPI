@@ -29,8 +29,8 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
+  //using populate('guides) fills up the field guides in the model Tour when you get a single tour. using populate creates a new query
   const tour = await Tour.findById(req.params.id);
-  // Tour.findOne({ _id: req.params.id })
 
   if (!tour) {
     return next(new AppError('No tour found with that ID', 404));
