@@ -98,6 +98,8 @@ const tourSchema = mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+
+tourSchema.index({ price: 1, ratingsAverage: -1 }); // 1 for ascending, 0 for descending
 tourSchema.virtual('durationWeeks').get(function () {
   //regular function has {this} keyword which we need.
   //cannot use this property in tourController
